@@ -1,6 +1,6 @@
-import React from "react";
+import React, {useState} from "react";
 import {ApolloClient, InMemoryCache, ApolloProvider, gql, useQuery} from "@apollo/client";
-import {Container} from "shards-react";
+import {Col, Container, FormInput, Row} from "shards-react";
 
 const client = new ApolloClient({
     uri: "http://localhost:4000/",
@@ -64,7 +64,29 @@ const Messages = ({user}) => {
 }
 
 const Chat = () => {
-    return <Container><Messages user="Vijay"/></Container>
+    const [userState, setUserState] = useState({
+        user: "Vijay",
+        content: ""
+    })
+    return <Container><Messages user="Vijay"/>
+        <Row>
+            <Col xs={2} style={{padding: "0"}}>
+                <FormInput label="User" value={userState.user} onChange={(evt) => {
+                    setUserState({
+                        ...userState,
+                        user: evt.target.value
+                    })
+                }} />
+            </Col>
+            <Col xs={8}>
+                <FormInput label="Message" value={userState.content} onChange={(evt) => {
+                    setUserState({
+                        ...userState,
+                        content: evt.target.value
+                    })
+                }} />
+            </Col>
+        </Row></Container>
 }
 
 export default () => (
