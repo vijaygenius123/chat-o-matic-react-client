@@ -1,6 +1,7 @@
 import React, {useState} from "react";
-import {ApolloClient, InMemoryCache, ApolloProvider, gql, useQuery} from "@apollo/client";
-import {Col, Container, FormInput, Row} from "shards-react";
+import {ApolloClient, InMemoryCache, ApolloProvider, gql, useQuery, useMutation} from "@apollo/client";
+import {Col, Container, FormInput, Row, Button} from "shards-react";
+import userEvent from "@testing-library/user-event";
 
 const client = new ApolloClient({
     uri: "http://localhost:4000/",
@@ -14,6 +15,12 @@ const GET_MESSAGES = gql`
             user,
             content
         }
+    }
+`
+
+const POST_MESSAGE = gql`
+    mutation ($user: String!, $content: String!){
+        postMessage(user: $user, content: $content)
     }
 `
 
@@ -68,6 +75,21 @@ const Chat = () => {
         user: "Vijay",
         content: ""
     })
+    const [postMessage] = useMutation(POST_MESSAGE)
+
+
+    const onSend = () => {
+        if (userState.content.length > 0) {
+            postMessage({
+                variables: userState
+            })
+        }
+        setUserState({
+            ...userState,
+            content: ''
+        })
+    }
+
     return <Container><Messages user="Vijay"/>
         <Row>
             <Col xs={2} style={{padding: "0"}}>
@@ -76,7 +98,7 @@ const Chat = () => {
                         ...userState,
                         user: evt.target.value
                     })
-                }} />
+                }}/>
             </Col>
             <Col xs={8}>
                 <FormInput label="Message" value={userState.content} onChange={(evt) => {
@@ -84,7 +106,8 @@ const Chat = () => {
                         ...userState,
                         content: evt.target.value
                     })
-                }} />
+                }}/>
+                <Button onClick={() => onSend()}>Send</Button>
             </Col>
         </Row></Container>
 }
